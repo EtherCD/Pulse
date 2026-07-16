@@ -12,12 +12,12 @@
 
 ## Stage
 
-[x] Basic types
-[x] Quantization
-[ ] Arrays
-[ ] Maps
-[ ] BitMasks
-[ ] Nestings
+- [x] Basic types
+- [x] Quantization
+- [ ] Arrays
+- [ ] Maps
+- [ ] BitMasks
+- [ ] Nestings
 
 ## Example Syntax
 
