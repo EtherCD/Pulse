@@ -1,25 +1,13 @@
-import PulseLexer, { LexerToken, LexerTokenType } from "./lexer";
-import { PulseType } from "./types";
+import PulseLexer, { LexerToken, LexerTokenType } from "../lexer";
+import { PulseType } from "../types";
+import { ParserPackage, ParserField, ParserType } from "./types";
 
-interface ParserType {
-  internalType: PulseType;
-  externalType?: PulseType;
-  quantizedStep?: number;
-}
-
-interface ParserField {
-  name: string;
-  type: ParserType;
-}
-
-interface ParserPackage {
-  name: string;
-  fields: ParserField[];
-}
+export * from "./types";
 
 export class PulseParser {
   tokens: Array<LexerToken>;
   position = 0;
+  packageIndex = 0;
 
   constructor(tokens: Array<LexerToken>) {
     this.tokens = tokens;
@@ -84,14 +72,13 @@ export class PulseParser {
     this.isLexerType(LexerTokenType.STRING);
     const lexerName = this.nextSkipSpaces();
 
-    // if (this.pick().type === LexerTokenType.LPARENTHESES) {
-    //   this.nextSkipSpaces();
-    //   while (
-    //     this.pick() &&
-    //     this.nextSkipSpaces().type === LexerTokenType.RPARENTHESES
-    //   ) {
-    //   }
-    // }
+    if (this.pick().type === LexerTokenType.LPARENTHESES) {
+      this.nextSkipSpaces();
+      while (
+        this.pick() &&
+        this.nextSkipSpaces().type !== LexerTokenType.RPARENTHESES
+      ) {}
+    }
     this.isLexerType(LexerTokenType.DOTS);
     this.next();
     this.skipNextLines();
@@ -100,9 +87,11 @@ export class PulseParser {
     while (this.pick() && this.pick().type === LexerTokenType.SPACE) {
       fields.push(this.parseField());
     }
+    this.packageIndex++;
     return {
       name: lexerName.value as string,
       fields,
+      index: this.packageIndex,
     };
   }
 
@@ -111,7 +100,6 @@ export class PulseParser {
     this.skipSpaces();
     this.isLexerType(LexerTokenType.STRING);
     const nameToken = this.next();
-    console.log(this.pick());
 
     this.isLexerType(LexerTokenType.DOTS);
     this.nextSkipSpaces();
@@ -178,7 +166,7 @@ export class PulseParser {
       throw new Error(
         "Unknown data type " +
           token.value +
-          `; line ${token.line} column ${token.column}`,
+          ` in line ${token.line} column ${token.column}`,
       );
     }
   }
@@ -218,7 +206,7 @@ export class PulseParser {
       return true;
     }
     throw new Error(
-      `Expected a value of type ${PulseLexer.typesToTokens[type]} but received ${PulseLexer.typesToTokens[token.type]}; line ${token.line}  column ${token.column}`,
+      `Expected a token of type ${PulseLexer.typesToTokens[type]} but received ${PulseLexer.typesToTokens[token.type]} in line ${token.line} column ${token.column}`,
     );
   }
 

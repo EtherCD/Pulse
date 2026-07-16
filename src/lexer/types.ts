@@ -1,0 +1,13 @@
+export enum LexerTokenType {
+  STRING,
+  DOTS,
+  TO,
+  LPARENTHESES,
+  RPARENTHESES,
+  LBRACKETS,
+  RBRACKETS,
+  EQUALS,
+  NUMBER,
+  SPACE,
+  NEXTLINE,
+}

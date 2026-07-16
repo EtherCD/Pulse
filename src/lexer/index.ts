@@ -1,16 +1,6 @@
-export enum LexerTokenType {
-  STRING,
-  DOTS,
-  TO,
-  LPARENTHESES,
-  RPARENTHESES,
-  LBRACKETS,
-  RBRACKETS,
-  EQUALS,
-  NUMBER,
-  SPACE,
-  NEXTLINE,
-}
+import { LexerTokenType } from "./types";
+
+export * from "./types";
 
 export interface LexerToken {
   type: LexerTokenType;
