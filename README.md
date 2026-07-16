@@ -4,7 +4,11 @@
 <p>Highly efficient data transmission format</p>
 </div>
 
-Soon..
+## Key features
+
+1. Classification of data types into internal and external.
+2. Automatic number quantization
+3. Bitmasks as a more efficient alternative to \`optional\`
 
 ## Example Syntax
 

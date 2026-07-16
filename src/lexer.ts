@@ -9,6 +9,7 @@ export enum LexerTokenType {
   EQUALS,
   NUMBER,
   SPACE,
+  NEXTLINE,
 }
 
 export interface LexerToken {
@@ -26,7 +27,7 @@ export default class PulseLexer {
   column: number;
   tokens: Array<LexerToken>;
 
-  static tokenTypes: Record<string, LexerTokenType> = {
+  public static tokenTypes: Record<string, LexerTokenType> = {
     ":": LexerTokenType.DOTS,
     "(": LexerTokenType.LPARENTHESES,
     ")": LexerTokenType.RPARENTHESES,
@@ -34,7 +35,22 @@ export default class PulseLexer {
     "]": LexerTokenType.RBRACKETS,
     "=": LexerTokenType.EQUALS,
     "-": LexerTokenType.TO,
+    "\n": LexerTokenType.NEXTLINE,
   } as const;
+
+  public static typesToTokens: Record<LexerTokenType, string> = {
+    [LexerTokenType.DOTS]: ":",
+    [LexerTokenType.LPARENTHESES]: "(",
+    [LexerTokenType.RPARENTHESES]: ")",
+    [LexerTokenType.LBRACKETS]: "[",
+    [LexerTokenType.RBRACKETS]: "]",
+    [LexerTokenType.EQUALS]: "=",
+    [LexerTokenType.TO]: "->",
+    [LexerTokenType.STRING]: "string",
+    [LexerTokenType.NUMBER]: "number",
+    [LexerTokenType.SPACE]: "space",
+    [LexerTokenType.NEXTLINE]: "nextline",
+  };
 
   static tokenKeys = new Set([":", "(", ")", "[", "]", "="]);
 
@@ -62,7 +78,10 @@ export default class PulseLexer {
         } else if (char === "-") {
           this.addToken(PulseLexer.tokenTypes[char], char + ">");
           this.next();
-        } else if (/[\s\n]/.test(char)) {
+        } else if (char === "\n") {
+          this.addToken(LexerTokenType.NEXTLINE, char);
+          this.next();
+        } else if (/\s/.test(char)) {
           this.addToken(LexerTokenType.SPACE, char);
           this.next();
         } else if (

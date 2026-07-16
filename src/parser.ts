@@ -1,4 +1,4 @@
-import { LexerToken, LexerTokenType } from "./lexer";
+import PulseLexer, { LexerToken, LexerTokenType } from "./lexer";
 import { PulseType } from "./types";
 
 interface ParserType {
@@ -63,11 +63,23 @@ export class PulseParser {
     "bool",
   ]);
 
-  parse() {
-    while (this.position < this.tokens.length) {}
+  parse(): ParserPackage[] {
+    let packages: ParserPackage[] = [];
+    while (this.position < this.tokens.length) {
+      const parsedPackage = this.parsePackage();
+      if (parsedPackage != null) {
+        packages.push(parsedPackage);
+      } else {
+        return packages;
+      }
+    }
+    return packages;
   }
 
-  parsePackage(): ParserPackage {
+  private parsePackage(): ParserPackage | null {
+    if (!this.pick()) return null;
+    this.skipSpaces();
+    this.skipNextLines();
     this.skipSpaces();
     this.isLexerType(LexerTokenType.STRING);
     const lexerName = this.nextSkipSpaces();
@@ -82,6 +94,8 @@ export class PulseParser {
     // }
     this.isLexerType(LexerTokenType.DOTS);
     this.next();
+    this.skipNextLines();
+
     let fields: ParserField[] = [];
     while (this.pick() && this.pick().type === LexerTokenType.SPACE) {
       fields.push(this.parseField());
@@ -93,9 +107,12 @@ export class PulseParser {
   }
 
   private parseField(): ParserField {
+    this.skipNextLines();
     this.skipSpaces();
     this.isLexerType(LexerTokenType.STRING);
     const nameToken = this.next();
+    console.log(this.pick());
+
     this.isLexerType(LexerTokenType.DOTS);
     this.nextSkipSpaces();
     const type = this.parseType();
@@ -109,7 +126,7 @@ export class PulseParser {
   private parseType(): ParserType {
     const internalType = this.parseTypeKey();
     const nextToken = this.pick();
-    if (nextToken.type === LexerTokenType.TO) {
+    if (nextToken && nextToken.type === LexerTokenType.TO) {
       this.nextSkipSpaces();
       const externalType = this.parseTypeKey();
       const nextToken = this.pick();
@@ -121,7 +138,9 @@ export class PulseParser {
         this.nextSkipSpaces();
         this.isLexerType(LexerTokenType.NUMBER);
         const parameterValue = this.nextSkipSpaces();
+        this.isLexerType(LexerTokenType.RPARENTHESES);
         this.nextSkipSpace();
+        this.skipNextLines();
 
         if ((parameterName.value as string) === "step") {
           return {
@@ -131,12 +150,15 @@ export class PulseParser {
           };
         }
       }
+      this.skipNextLines();
 
       return {
         internalType,
         externalType,
       };
     }
+
+    this.skipNextLines();
     return {
       internalType,
     };
@@ -150,6 +172,7 @@ export class PulseParser {
       PulseParser.typesKeys.has(tokenValue)
     ) {
       this.nextSkipSpace();
+
       return PulseParser.types[tokenValue];
     } else {
       throw new Error(
@@ -161,7 +184,14 @@ export class PulseParser {
   }
 
   private skipSpaces() {
-    while (this.pick().type === LexerTokenType.SPACE) {
+    if (this.pick())
+      while (this.pick().type === LexerTokenType.SPACE) {
+        this.next();
+      }
+  }
+
+  private skipNextLines() {
+    while (this.pick() && this.pick().type === LexerTokenType.NEXTLINE) {
       this.next();
     }
   }
@@ -188,7 +218,7 @@ export class PulseParser {
       return true;
     }
     throw new Error(
-      `Expected a value of type ${type} but received ${token.type}; line ${token.line}  column ${token.column}`,
+      `Expected a value of type ${PulseLexer.typesToTokens[type]} but received ${PulseLexer.typesToTokens[token.type]}; line ${token.line}  column ${token.column}`,
     );
   }
 
