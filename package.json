@@ -1,0 +1,21 @@
+{
+  "name": "pulse",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "EtherCD",
+  "type": "commonjs",
+  "main": "./lib/index.js",
+  "scripts": {
+    "lint": "tslint -c tslint.json src/**/*.ts"
+  },
+  "dependencies": {
+    "tslint": "^5.20.1",
+    "typescript": "^7.0.2"
+  },
+  "files": [
+    "./bin/*",
+    "./lib/*"
+  ],
+  "typings": "./lib/index.d.ts"
+}
