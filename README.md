@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="misc/pulse.svg" width="75" alt="Pulse Logotype"/>
-  <h1>Pulse</h1>
-  <p><strong>Highly efficient data transmission format</strong></p>
+  <img src="misc/pulsar.svg" width="75" alt="Pulse Logotype"/>
+  <h1>Pulsar</h1>
+  <p><strong>A Compiler for Pulse - Highly efficient data transmission format</strong></p>
 </div>
 
 ## 📦 What is Pulse?
