@@ -1,4 +1,4 @@
-import { PulseType } from "../types";
+import { PulseHeader, PulseType } from "../types";
 
 export interface ParserType {
   internalType: PulseType;
@@ -9,10 +9,13 @@ export interface ParserType {
 export interface ParserField {
   name: string;
   type: ParserType;
+  isStatic?: boolean;
+  isPartial?: boolean;
 }
 
 export interface ParserPackage {
   name: string;
   fields: ParserField[];
   index: number;
+  header?: PulseHeader;
 }

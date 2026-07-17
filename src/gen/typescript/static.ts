@@ -97,6 +97,27 @@ class BufferReader {
     return value;
   }
 
+  private static halfBitsToFloat(bits: number): number {
+    const sign = bits >> 15 ? -1 : 1;
+    const exponent = (bits & 0x7c00) >> 10;
+    const fraction = bits & 0x03ff;
+
+    if (exponent === 0) {
+      return sign * fraction * Math.pow(2, -24);
+    }
+
+    if (exponent === 0x1f) {
+      return fraction ? NaN : sign * Infinity;
+    }
+
+    return sign * (1 + fraction / 1024) * Math.pow(2, exponent - 15);
+  }
+
+  readF16(): number {
+    const bits = this.readU16();
+    return BufferReader.halfBitsToFloat(bits);
+  }
+
   readF32(): number {
     this.ensure(4);
     const value = this.view.getFloat32(this.offset, true);
@@ -145,10 +166,44 @@ class BufferWriter {
 
   private static readonly encoder = new TextEncoder();
 
+  private static readonly f32Scratch = new Float32Array(1);
+  private static readonly i32Scratch = new Int32Array(
+    BufferWriter.f32Scratch.buffer,
+  );
+
   constructor(initialCapacity: number = 64) {
     this.buffer = new ArrayBuffer(initialCapacity);
     this.data = new Uint8Array(this.buffer);
     this.view = new DataView(this.buffer);
+  }
+
+  private static floatToHalfBits(value: number): number {
+    BufferWriter.f32Scratch[0] = value;
+    const x = BufferWriter.i32Scratch[0];
+
+    const sign = (x >> 16) & 0x8000;
+    let m = (x >> 12) & 0x07ff;
+    const e = (x >> 23) & 0xff;
+
+    if (e < 103) {
+      return sign;
+    }
+
+    if (e > 142) {
+      if (e === 255 && x & 0x007fffff) {
+        return sign | 0x7c00 | 0x0200;
+      }
+      return sign | 0x7c00;
+    }
+
+    if (e < 113) {
+      m |= 0x0800;
+      return sign | ((m >> (114 - e)) + ((m >> (113 - e)) & 1));
+    }
+
+    let bits = sign | ((e - 112) << 10) | (m >> 1);
+    bits += m & 1;
+    return bits;
   }
 
   private ensure(bytes: number): void {
@@ -242,6 +297,11 @@ class BufferWriter {
     this.offset += 8;
   }
 
+  writeF16(value: number): void {
+    const bits = BufferWriter.floatToHalfBits(value);
+    this.writeU16(bits);
+  }
+
   writeF32(value: number): void {
     this.ensure(4);
     this.view.setFloat32(this.offset, value, true);
@@ -294,6 +354,11 @@ class Quantaizer {
   public static fromF32ToQ16(value: number, step: number): number {
     const q = Math.round(value / step);
     return Math.min(32767, Math.max(-32767, q));
+  }
+
+  public static fromF32ToUQ16(value: number, step: number): number {
+    const q = Math.round(value / step);
+    return Math.min(65536, Math.max(0, q));
   }
 
   public static fromQ16ToF32(quantized: number, step: number): number {

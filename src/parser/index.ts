@@ -1,5 +1,6 @@
+import { ParseError } from "../errors";
 import PulseLexer, { LexerToken, LexerTokenType } from "../lexer";
-import { PulseType } from "../types";
+import { PulseHeader, PulseType } from "../types";
 import { ParserPackage, ParserField, ParserType } from "./types";
 
 export * from "./types";
@@ -21,13 +22,15 @@ export class PulseParser {
     u32: PulseType.U32,
     vu32: PulseType.VU32,
     i32: PulseType.I32,
+    f16: PulseType.F16,
     f32: PulseType.F32,
     f64: PulseType.F64,
     u64: PulseType.U64,
     i64: PulseType.I64,
     q8: PulseType.Q8,
+    uq8: PulseType.UQ8,
     q16: PulseType.Q16,
-    vq16: PulseType.VQ16,
+    uq16: PulseType.UQ16,
     str: PulseType.STR,
     bool: PulseType.BOOL,
   } as const;
@@ -40,16 +43,24 @@ export class PulseParser {
     "u32",
     "vu32",
     "i32",
+    "f16",
     "f32",
     "f64",
     "u64",
     "i64",
     "q8",
+    "uq8",
     "q16",
-    "vq16",
+    "uq16",
     "str",
     "bool",
   ]);
+
+  static headers = new Set(["partial"]);
+
+  static headerToType: Record<string, PulseHeader> = {
+    partial: PulseHeader.Partial,
+  } as const;
 
   parse(): ParserPackage[] {
     let packages: ParserPackage[] = [];
@@ -71,13 +82,19 @@ export class PulseParser {
     this.skipSpaces();
     this.isLexerType(LexerTokenType.STRING);
     const lexerName = this.nextSkipSpaces();
+    let header;
 
     if (this.pick().type === LexerTokenType.LPARENTHESES) {
       this.nextSkipSpaces();
-      while (
-        this.pick() &&
-        this.nextSkipSpaces().type !== LexerTokenType.RPARENTHESES
-      ) {}
+      this.isLexerType(LexerTokenType.STRING);
+      const headerToken = this.next();
+      header =
+        PulseParser.headerToType[headerToken.value!.toString().toLowerCase()];
+      if (!PulseParser.headers.has(header)) {
+        throw new ParseError("Unknown header type", headerToken);
+      }
+      this.isLexerType(LexerTokenType.RPARENTHESES);
+      this.next();
     }
     this.isLexerType(LexerTokenType.DOTS);
     this.next();
@@ -85,19 +102,25 @@ export class PulseParser {
 
     let fields: ParserField[] = [];
     while (this.pick() && this.pick().type === LexerTokenType.SPACE) {
-      fields.push(this.parseField());
+      fields.push(this.parseField(header));
     }
     this.packageIndex++;
     return {
       name: lexerName.value as string,
       fields,
       index: this.packageIndex,
+      header,
     };
   }
 
-  private parseField(): ParserField {
+  private parseField(header?: PulseHeader): ParserField {
     this.skipNextLines();
     this.skipSpaces();
+    let isStatic;
+    if (this.pick().type === LexerTokenType.PLUS) {
+      isStatic = true;
+      this.next();
+    }
     this.isLexerType(LexerTokenType.STRING);
     const nameToken = this.next();
 
@@ -108,6 +131,8 @@ export class PulseParser {
     return {
       name: nameToken.value as string,
       type,
+      isStatic,
+      isPartial: header == PulseHeader.Partial,
     };
   }
 
@@ -120,23 +145,17 @@ export class PulseParser {
       const nextToken = this.pick();
       if (nextToken && nextToken.type === LexerTokenType.LPARENTHESES) {
         this.nextSkipSpaces();
-        this.isLexerType(LexerTokenType.STRING);
-        const parameterName = this.nextSkipSpaces();
-        this.isLexerType(LexerTokenType.EQUALS);
-        this.nextSkipSpaces();
         this.isLexerType(LexerTokenType.NUMBER);
         const parameterValue = this.nextSkipSpaces();
         this.isLexerType(LexerTokenType.RPARENTHESES);
         this.nextSkipSpace();
         this.skipNextLines();
 
-        if ((parameterName.value as string) === "step") {
-          return {
-            internalType,
-            externalType,
-            quantizedStep: parameterValue.value as number,
-          };
-        }
+        return {
+          internalType,
+          externalType,
+          quantizedStep: parameterValue.value as number,
+        };
       }
       this.skipNextLines();
 

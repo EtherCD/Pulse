@@ -26,6 +26,7 @@ export default class PulseLexer {
     "=": LexerTokenType.EQUALS,
     "-": LexerTokenType.TO,
     "\n": LexerTokenType.NEXTLINE,
+    "+": LexerTokenType.PLUS,
   } as const;
 
   public static typesToTokens: Record<LexerTokenType, string> = {
@@ -40,9 +41,10 @@ export default class PulseLexer {
     [LexerTokenType.NUMBER]: "number",
     [LexerTokenType.SPACE]: "space",
     [LexerTokenType.NEXTLINE]: "nextline",
+    [LexerTokenType.PLUS]: "+",
   };
 
-  static tokenKeys = new Set([":", "(", ")", "[", "]", "="]);
+  static tokenKeys = new Set([":", "(", ")", "[", "]", "=", "+"]);
 
   constructor(input: string) {
     this.input = input;

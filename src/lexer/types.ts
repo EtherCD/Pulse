@@ -10,4 +10,5 @@ export enum LexerTokenType {
   NUMBER,
   SPACE,
   NEXTLINE,
+  PLUS,
 }
