@@ -27,14 +27,14 @@ It combines:
 | ------------ | ------ |
 | Basic types  | ✅     |
 | Quantisation | ✅     |
-| Arrays       | ☐      |
-| Maps         | ☐      |
+| Arrays       | ❌     |
+| Maps         | ❌     |
 | BitMasks     | ✅     |
-| Nestings     | ☐      |
+| Nestings     | ❌     |
 
 > **Note:**  
 > `✅` – implemented,  
-> `☐` – work in progress.
+> `❌` – work in progress.
 
 ## 📝 Syntax Example
 
