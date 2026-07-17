@@ -29,6 +29,7 @@ PackedEntity:
 
 PartialEntity(Partial):
   +id: u64 -> vu32
+  type: char
   x: f32 -> f16
   y: f32 -> f16
   radius: f32 -> uq8(0.5)

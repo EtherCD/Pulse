@@ -18,6 +18,7 @@ export enum PulseType {
   UQ16 = "uq16",
   STR = "str",
   BOOL = "bool",
+  CHAR = "char",
 }
 
 export enum PulseHeader {

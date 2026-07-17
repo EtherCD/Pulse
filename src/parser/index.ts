@@ -33,6 +33,7 @@ export class PulseParser {
     uq16: PulseType.UQ16,
     str: PulseType.STR,
     bool: PulseType.BOOL,
+    char: PulseType.CHAR,
   } as const;
 
   static typesKeys = new Set([
@@ -54,6 +55,7 @@ export class PulseParser {
     "uq16",
     "str",
     "bool",
+    "char",
   ]);
 
   static headers = new Set(["partial"]);

@@ -34,6 +34,7 @@ const TO_TYPE: TypeMap = {
   [PulseType.UQ16]: "number",
   [PulseType.STR]: "string",
   [PulseType.BOOL]: "boolean",
+  [PulseType.CHAR]: "string",
 };
 
 const TO_WRITER_FUNCTION: Record<PulseType, string> = {
@@ -56,6 +57,7 @@ const TO_WRITER_FUNCTION: Record<PulseType, string> = {
   [PulseType.UQ16]: "writeU16",
   [PulseType.STR]: "writeString",
   [PulseType.BOOL]: "writeBool",
+  [PulseType.CHAR]: "writeChar",
 };
 
 const TO_READER_FUNCTION: Record<PulseType, string> = {
@@ -78,6 +80,7 @@ const TO_READER_FUNCTION: Record<PulseType, string> = {
   [PulseType.UQ16]: "readU16",
   [PulseType.STR]: "readString",
   [PulseType.BOOL]: "readBool",
+  [PulseType.CHAR]: "readChar",
 };
 
 const TO_QUNATIZER_WRITE_TYPE: Record<

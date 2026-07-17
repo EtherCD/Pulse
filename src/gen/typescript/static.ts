@@ -132,6 +132,13 @@ class BufferReader {
     return value;
   }
 
+  readChar(): string {
+    this.ensure(1);
+    const bytes = this.data.subarray(this.offset, this.offset + 1);
+    this.offset += 1;
+    return BufferReader.decoder.decode(bytes);
+  }
+
   readString(): string {
     const length = this.readVarU32();
     this.ensure(length);
@@ -312,6 +319,15 @@ class BufferWriter {
     this.ensure(8);
     this.view.setFloat64(this.offset, value, true);
     this.offset += 8;
+  }
+
+  writeChar(value: string): void {
+    if (value.length < 1) 
+      throw new RangeError(
+        \`BufferWriter: writeChar char length is below 1 (value = \${value})\`,
+      );
+    const bytes = BufferWriter.encoder.encode(value);
+    this.writeU8(bytes[0]);
   }
 
   writeString(value: string): void {
