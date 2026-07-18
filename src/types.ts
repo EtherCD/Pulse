@@ -25,6 +25,8 @@ export enum PulseHeader {
   Partial = "partial",
 }
 
+export type PulseQuantizeCandidatesType = PulseType.F32 | PulseType.F64;
+
 export type PulseQuantizedType =
   | PulseType.Q16
   | PulseType.Q8

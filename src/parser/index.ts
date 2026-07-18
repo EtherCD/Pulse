@@ -21,6 +21,7 @@ export class PulseParser {
     i16: PulseType.I16,
     u32: PulseType.U32,
     vu32: PulseType.VU32,
+    vi32: PulseType.VI32,
     i32: PulseType.I32,
     f16: PulseType.F16,
     f32: PulseType.F32,
@@ -43,6 +44,7 @@ export class PulseParser {
     "i16",
     "u32",
     "vu32",
+    "vi32",
     "i32",
     "f16",
     "f32",
@@ -141,6 +143,13 @@ export class PulseParser {
   private parseType(): ParserType {
     const internalType = this.parseTypeKey();
     const nextToken = this.pick();
+    let isArray;
+    if (nextToken && nextToken.type === LexerTokenType.LBRACKETS) {
+      this.nextSkipSpace();
+      this.isLexerType(LexerTokenType.RBRACKETS);
+      this.nextSkipSpace();
+      isArray = true;
+    }
     if (nextToken && nextToken.type === LexerTokenType.TO) {
       this.nextSkipSpaces();
       const externalType = this.parseTypeKey();
@@ -157,6 +166,7 @@ export class PulseParser {
           internalType,
           externalType,
           quantizedStep: parameterValue.value as number,
+          isArray,
         };
       }
       this.skipNextLines();
@@ -164,12 +174,14 @@ export class PulseParser {
       return {
         internalType,
         externalType,
+        isArray,
       };
     }
 
     this.skipNextLines();
     return {
       internalType,
+      isArray,
     };
   }
 
@@ -213,12 +225,13 @@ export class PulseParser {
     return next;
   }
 
-  private nextSkipSpace(): LexerToken {
-    let next = this.next();
-    if (this.pick().type === LexerTokenType.SPACE) {
-      this.next();
+  private nextSkipSpace() {
+    if (this.pick()) {
+      let next = this.next();
+      if (next && this.pick() && this.pick().type === LexerTokenType.SPACE) {
+        this.next();
+      }
     }
-    return next;
   }
 
   private isLexerType(type: LexerTokenType): boolean {

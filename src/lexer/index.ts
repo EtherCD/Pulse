@@ -50,7 +50,7 @@ export default class PulseLexer {
     this.input = input;
     this.length = input.length;
     this.position = 0;
-    this.line = 0;
+    this.line = 1;
     this.column = 0;
     this.tokens = [];
   }

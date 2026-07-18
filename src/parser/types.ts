@@ -4,6 +4,7 @@ export interface ParserType {
   internalType: PulseType;
   externalType?: PulseType;
   quantizedStep?: number;
+  isArray?: boolean;
 }
 
 export interface ParserField {

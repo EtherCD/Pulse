@@ -27,7 +27,7 @@ It combines:
 | ------------ | ------ |
 | Basic types  | ✅     |
 | Quantisation | ✅     |
-| Arrays       | ❌     |
+| Arrays       | ✅     |
 | Maps         | ❌     |
 | BitMasks     | ✅     |
 | Nestings     | ❌     |
@@ -58,12 +58,12 @@ PartialPlayer(Partial):
 
 ### Clarifications
 
-| Symbol         | Meaning                                                                              |
-| -------------- | ------------------------------------------------------------------------------------ |
-| `+`            | Field is required in the `Partial` type.                                             |
-| `->`           | The type before the arrow is internal; after it is external (sent over the network). |
-| `vu32`, `uv32` | Variable‑length unsigned integers (varint).                                          |
-| `q16(0.5)`     | Quantised number with a step of 0.5.                                                 |
+| Symbol     | Meaning                                                                              |
+| ---------- | ------------------------------------------------------------------------------------ |
+| `+`        | Field is required in the `Partial` type.                                             |
+| `->`       | The type before the arrow is internal; after it is external (sent over the network). |
+| `uv32`     | Variable‑length unsigned integers (varint).                                          |
+| `q16(0.5)` | Quantised number with a step of 0.5.                                                 |
 
 ### Supported Types
 

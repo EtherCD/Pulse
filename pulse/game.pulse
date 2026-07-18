@@ -1,0 +1,53 @@
+PackedPlayer:
+  id: u64 -> vu32
+  name: str
+  x: f32
+  y: f32
+  radius: f32
+  speed: f32
+  energy: f32
+  max_energy: f32
+  death_timer: f32
+  state: u8
+  state_meta: f32
+  area: vu32
+  world: str
+  downed: bool
+  hero: u32
+
+PartialPlayer(Partial):
+  +id: u64 -> vu32
+  name: str
+  x: f32 -> q16(0.5)
+  y: f32 -> q16(0.5)
+  radius: f32 -> q16(0.5)
+  speed: f32 -> q16(0.5)
+  energy: f32 -> q16(0.5)
+  max_energy: f32 -> q16(0.5)
+  death_timer: f32 -> q8(0.6)
+  state: u8
+  state_meta: f32
+  area: u64 -> vu32
+  world: str
+  downed: bool
+
+PackedEntity:
+  id: u64 -> vu32
+  type_id: vu32
+  x: f32
+  y: f32
+  radius: f32
+  harmless: bool
+  state: u8
+  state_meta: f32
+  alpha: f32
+
+PartialEntity(Partial):
+  +id: u64 -> vu32
+  x: f32 -> q16(0.5)
+  y: f32 -> q16(0.5)
+  radius: f32 -> q16(0.5)
+  harmless: bool[]
+  state: u8[]
+  state_meta: f32 -> q16(0.5)
+  alpha: f32 -> q8(0.39)

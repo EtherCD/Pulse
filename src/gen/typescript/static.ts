@@ -83,6 +83,11 @@ class BufferReader {
     }
   }
 
+  readVarI32(): number {
+    const encoded = this.readVarU32();
+    return (encoded >> 1) ^ (-(encoded & 1));
+  }
+
   readU64(): bigint {
     this.ensure(8);
     const value = this.view.getBigUint64(this.offset, true);
@@ -290,6 +295,20 @@ class BufferWriter {
     }
 
     this.writeU8(x & REST);
+  }
+
+  writeVarI32(value: number): void {
+    if (!Number.isSafeInteger(value)) {
+      throw new RangeError("BufferWriter: value must be an integer");
+    }
+    if (value < -(2 ** 31) || value >= 2 ** 31) {
+      throw new RangeError(
+        \`BufferWriter: value out of 32-bit range (value = \${value})\`
+      );
+    }
+    
+    const encoded = (value << 1) ^ (value >> 31);
+    this.writeVarU32(encoded >>> 0);
   }
 
   writeU64(value: bigint): void {
