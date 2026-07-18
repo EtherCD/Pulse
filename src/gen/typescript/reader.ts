@@ -14,7 +14,7 @@ export class GenerateTypeScriptRead {
     pkg: ParserPackage,
   ) {
     typescript.writeLines(
-      `\tprivate static readPackage(reader: BufferReader): I${pkg.name} {`,
+      `\tpublic static readPackage(reader: BufferReader): I${pkg.name} {`,
       `\t\tif (reader.readVarU32() !== ${pkg.index}) throw new Error("Read package type mismatch")`,
     );
     if (pkg.header === PulseHeader.Partial) {
@@ -28,7 +28,7 @@ export class GenerateTypeScriptRead {
             field.type.internalType === PulseType.F32 &&
             PulseQuantizedTypes.includes(field.type.externalType!)
           ) {
-            this.genQuantizeFieldReader(typescript, field);
+            this.genQuantizeFieldReader(typescript, field, pkg.name);
             continue;
           }
         }
@@ -48,10 +48,21 @@ export class GenerateTypeScriptRead {
   private static genQuantizeFieldReader(
     typescript: TypeScriptGenerator,
     field: ParserField,
+    packageName: string,
   ) {
+    console.log(field.type);
     if (field.type.isArray)
+      if (field.isPartial && !field.isStatic)
+        typescript.writeLine(
+          `\t\t\t${field.name}: Array.from({length: reader.readVarU32()}).map(() => ${this.genBitmaskConditionReader(this.genQuantizeValueReader(field), field, packageName)}),`,
+        );
+      else
+        typescript.writeLine(
+          `\t\t\t${field.name}: Array.from({length: reader.readVarU32()}).map(() => ${this.genQuantizeValueReader(field)}),`,
+        );
+    else if (field.isPartial && !field.isStatic)
       typescript.writeLine(
-        `\t\t\t${field.name}: Array.from({length: reader.readVarU32()}).map(() => ${this.genQuantizeValueReader(field)}),`,
+        `\t\t\t${field.name}: ${this.genBitmaskConditionReader(this.genQuantizeValueReader(field), field, packageName)},`,
       );
     else
       typescript.writeLine(
@@ -107,6 +118,9 @@ export class GenerateTypeScriptRead {
   }
 
   private static genValue(field: ParserField): string {
+    if (field.type.isNestedType) {
+      return `${field.type.isNestedType}.readPackage(reader)`;
+    }
     if (field.type.externalType)
       return `reader.${TO_READER_FUNCTION[field.type.externalType!]}()`;
     else return `reader.${TO_READER_FUNCTION[field.type.internalType]}()`;

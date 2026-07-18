@@ -19,6 +19,7 @@ export enum PulseType {
   STR = "str",
   BOOL = "bool",
   CHAR = "char",
+  NESTED = "nested",
 }
 
 export enum PulseHeader {

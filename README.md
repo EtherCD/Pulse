@@ -30,7 +30,7 @@ It combines:
 | Arrays       | ✅     |
 | Maps         | ❌     |
 | BitMasks     | ✅     |
-| Nestings     | ❌     |
+| Nestings     | ✅     |
 
 > **Note:**  
 > `✅` – implemented,  
@@ -39,21 +39,18 @@ It combines:
 ## 📝 Syntax Example
 
 ```text
-PartialPlayer(Partial):
+PartialEntity(Partial):
   +id: u64 -> vu32
-  name: str
   x: f32 -> q16(0.5)
   y: f32 -> q16(0.5)
   radius: f32 -> q16(0.5)
-  speed: f32 -> q16(0.5)
-  energy: f32 -> q16(0.5)
-  max_energy: f32 -> q16(0.5)
-  death_timer: q8 -> q8(0.6)
+  harmless: bool
   state: u8
-  state_meta: f32
-  area: u64 -> uv32
-  world: str
-  downed: bool
+  state_meta: f32 -> q16(0.5)
+  alpha: f32 -> q8(0.39)
+
+UpdateEntities:
+  values: PartialEntity[]
 ```
 
 ### Clarifications

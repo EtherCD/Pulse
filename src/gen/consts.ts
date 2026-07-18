@@ -1,6 +1,9 @@
 import { PulseType } from "../types";
 
-export type TypeMap = Record<PulseType, "number" | "string" | "boolean">;
+export type TypeMap = Record<
+  PulseType,
+  "number" | "string" | "boolean" | "object"
+>;
 
 export const TO_TYPE: TypeMap = {
   [PulseType.U8]: "number",
@@ -23,6 +26,7 @@ export const TO_TYPE: TypeMap = {
   [PulseType.STR]: "string",
   [PulseType.BOOL]: "boolean",
   [PulseType.CHAR]: "string",
+  [PulseType.NESTED]: "object",
 };
 
 export const TO_WRITER_FUNCTION: Record<PulseType, string> = {
@@ -46,6 +50,7 @@ export const TO_WRITER_FUNCTION: Record<PulseType, string> = {
   [PulseType.STR]: "writeString",
   [PulseType.BOOL]: "writeBool",
   [PulseType.CHAR]: "writeChar",
+  [PulseType.NESTED]: "",
 };
 
 export const TO_READER_FUNCTION: Record<PulseType, string> = {
@@ -69,6 +74,7 @@ export const TO_READER_FUNCTION: Record<PulseType, string> = {
   [PulseType.STR]: "readString",
   [PulseType.BOOL]: "readBool",
   [PulseType.CHAR]: "readChar",
+  [PulseType.NESTED]: "",
 };
 
 export const TO_QUNATIZER_WRITE_TYPE: Record<

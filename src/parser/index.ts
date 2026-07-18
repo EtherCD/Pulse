@@ -60,6 +60,14 @@ export class PulseParser {
     "char",
   ]);
 
+  static typesKeysWithoutNestings: Set<string> = new Set([]);
+
+  static {
+    PulseParser.typesKeys.forEach((val) =>
+      PulseParser.typesKeysWithoutNestings.add(val),
+    );
+  }
+
   static headers = new Set(["partial"]);
 
   static headerToType: Record<string, PulseHeader> = {
@@ -109,6 +117,7 @@ export class PulseParser {
       fields.push(this.parseField(header));
     }
     this.packageIndex++;
+    PulseParser.typesKeys.add(lexerName.value as string);
     return {
       name: lexerName.value as string,
       fields,
@@ -141,8 +150,11 @@ export class PulseParser {
   }
 
   private parseType(): ParserType {
-    const internalType = this.parseTypeKey();
+    const [typeName, internalType] = this.parseTypeKey();
     const nextToken = this.pick();
+    let isNestedType = !PulseParser.typesKeysWithoutNestings.has(typeName)
+      ? typeName
+      : undefined;
     let isArray;
     if (nextToken && nextToken.type === LexerTokenType.LBRACKETS) {
       this.nextSkipSpace();
@@ -152,7 +164,7 @@ export class PulseParser {
     }
     if (nextToken && nextToken.type === LexerTokenType.TO) {
       this.nextSkipSpaces();
-      const externalType = this.parseTypeKey();
+      const [_, externalType] = this.parseTypeKey();
       const nextToken = this.pick();
       if (nextToken && nextToken.type === LexerTokenType.LPARENTHESES) {
         this.nextSkipSpaces();
@@ -167,6 +179,7 @@ export class PulseParser {
           externalType,
           quantizedStep: parameterValue.value as number,
           isArray,
+          isNestedType,
         };
       }
       this.skipNextLines();
@@ -175,6 +188,7 @@ export class PulseParser {
         internalType,
         externalType,
         isArray,
+        isNestedType,
       };
     }
 
@@ -182,10 +196,11 @@ export class PulseParser {
     return {
       internalType,
       isArray,
+      isNestedType,
     };
   }
 
-  private parseTypeKey(): PulseType {
+  private parseTypeKey(): [string, PulseType] {
     const token = this.pick();
     const tokenValue = token.value as string;
     if (
@@ -194,7 +209,9 @@ export class PulseParser {
     ) {
       this.nextSkipSpace();
 
-      return PulseParser.types[tokenValue];
+      if (PulseParser.typesKeysWithoutNestings.has(tokenValue))
+        return [tokenValue, PulseParser.types[tokenValue]];
+      return [tokenValue, PulseType.NESTED];
     } else {
       throw new Error(
         "Unknown data type " +

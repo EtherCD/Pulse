@@ -9,7 +9,7 @@ export class GenerateTypeScriptWrite {
     pkg: ParserPackage,
   ) {
     typescript.writeLines(
-      `\tprivate static writePackage(value: I${pkg.name}, writer: BufferWriter) {`,
+      `\tpublic static writePackage(value: I${pkg.name}, writer: BufferWriter) {`,
       `\t\twriter.writeVarU32(${pkg.index})`,
     );
     if (pkg.header === PulseHeader.Partial)
@@ -52,7 +52,9 @@ export class GenerateTypeScriptWrite {
   }
 
   private static genValue(field: ParserField, arrayIndex?: string): string {
-    if (field.type.quantizedStep) {
+    if (field.type.isNestedType) {
+      return `${field.type.isNestedType}.writePackage(value["${field.name}"]${arrayIndex ? `[${arrayIndex}]` : ""}, writer)`;
+    } else if (field.type.quantizedStep) {
       const quantizer =
         TO_QUNATIZER_WRITE_TYPE[field.type.internalType as PulseType.F32][
           field.type.externalType! as PulseQuantizedType

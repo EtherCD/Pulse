@@ -5,6 +5,7 @@ export interface ParserType {
   externalType?: PulseType;
   quantizedStep?: number;
   isArray?: boolean;
+  isNestedType?: string;
 }
 
 export interface ParserField {

@@ -47,7 +47,10 @@ PartialEntity(Partial):
   x: f32 -> q16(0.5)
   y: f32 -> q16(0.5)
   radius: f32 -> q16(0.5)
-  harmless: bool[]
-  state: u8[]
+  harmless: bool
+  state: u8
   state_meta: f32 -> q16(0.5)
   alpha: f32 -> q8(0.39)
+
+UpdateEntities:
+  values: PartialEntity[]
