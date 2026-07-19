@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="misc/pulsar.svg" width="75" alt="Pulse Logotype"/>
+  <img src="misc/pulsar.svg" width="100" alt="Pulse Logotype"/>
   <h1>Pulsar</h1>
   <p><strong>A Compiler for Pulse - Highly efficient data transmission format</strong></p>
 </div>

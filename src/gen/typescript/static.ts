@@ -183,7 +183,7 @@ class BufferWriter {
     BufferWriter.f32Scratch.buffer,
   );
 
-  constructor(initialCapacity: number = 64) {
+  constructor(initialCapacity: number = 16384) {
     this.buffer = new ArrayBuffer(initialCapacity);
     this.data = new Uint8Array(this.buffer);
     this.view = new DataView(this.buffer);
@@ -400,7 +400,3 @@ class Quantaizer {
     return quantized * step;
   }
 }`;
-
-export const staticTypeScriptTypeTransformer = `
-class 
-`;

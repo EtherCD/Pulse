@@ -5,30 +5,6 @@ export type TypeMap = Record<
   "number" | "string" | "boolean" | "object"
 >;
 
-export const TO_TYPE: TypeMap = {
-  [PulseType.U8]: "number",
-  [PulseType.I8]: "number",
-  [PulseType.U16]: "number",
-  [PulseType.I16]: "number",
-  [PulseType.U32]: "number",
-  [PulseType.I32]: "number",
-  [PulseType.VU32]: "number",
-  [PulseType.VI32]: "number",
-  [PulseType.F16]: "number",
-  [PulseType.F32]: "number",
-  [PulseType.F64]: "number",
-  [PulseType.U64]: "number",
-  [PulseType.I64]: "number",
-  [PulseType.Q8]: "number",
-  [PulseType.UQ8]: "number",
-  [PulseType.Q16]: "number",
-  [PulseType.UQ16]: "number",
-  [PulseType.STR]: "string",
-  [PulseType.BOOL]: "boolean",
-  [PulseType.CHAR]: "string",
-  [PulseType.NESTED]: "object",
-};
-
 export const TO_WRITER_FUNCTION: Record<PulseType, string> = {
   [PulseType.U8]: "writeU8",
   [PulseType.I8]: "writeI8",

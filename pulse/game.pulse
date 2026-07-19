@@ -1,3 +1,9 @@
+Chat:
+  id: u64 -> vu32
+  content: str
+  author: str
+  world: str
+
 PackedPlayer:
   id: u64 -> vu32
   name: str
@@ -27,7 +33,7 @@ PartialPlayer(Partial):
   death_timer: f32 -> q8(0.6)
   state: u8
   state_meta: f32
-  area: u64 -> vu32
+  area: vu32
   world: str
   downed: bool
 
@@ -52,5 +58,42 @@ PartialEntity(Partial):
   state_meta: f32 -> q16(0.5)
   alpha: f32 -> q8(0.39)
 
+PackedArea:
+  w: f32 -> q16(0.5)
+  h: f32 -> q16(0.5)
+  area: u32
+  world: str
+  entities: PackedEntity[]
+
+Players:
+  players: PackedPlayer[]
+
+Entities:
+  entities: PackedEntity[]
+
+ClosePlayer:
+  id: vu32
+
+CloseEntities:
+  ids: vu32[]
+
 UpdateEntities:
-  values: PartialEntity[]
+  items: PartialEntity[]
+
+UpdatePlayers:
+  items: PartialPlayer[]
+
+Package(Partial):
+  new_player: PackedPlayer
+  close_player: ClosePlayer
+  players: Players
+  new_entities: Entities
+  close_entities: CloseEntities
+  area_init: PackedArea
+  myself: PackedPlayer
+  update_entities: UpdateEntities 
+  update_players: UpdatePlayers 
+  chat: Chat 
+
+Packages:
+  items: Package[]

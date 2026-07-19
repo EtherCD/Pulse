@@ -1,21 +1,22 @@
 import { ParserPackage, ParserField } from "../../parser";
 import {
   PulseHeader,
-  PulseType,
-  PulseQuantizedTypes,
   PulseQuantizedType,
+  PulseQuantizedTypes,
+  PulseType,
 } from "../../types";
-import { TO_QUNATIZER_READ_TYPE, TO_READER_FUNCTION } from "../consts";
-import { TypeScriptGenerator } from "../typescript";
-import { TO_TYPESCRIPT_TYPE } from "./consts";
+import {
+  TO_READER_RUST_FUNCTION,
+  TO_RUST_QUNATIZER_WRITE_TYPE,
+  TO_RUST_TYPE,
+  TO_WRITER_RUST_FUNCTION,
+} from "./consts";
+import { RustGenerator } from "../rust";
 
 export class GenerateTypeScriptRead {
-  public static genFunction(
-    typescript: TypeScriptGenerator,
-    pkg: ParserPackage,
-  ) {
+  public static genFunction(typescript: RustGenerator, pkg: ParserPackage) {
     typescript.writeLines(
-      `\tpublic static readPackage(reader: BufferReader): I${pkg.name} {`,
+      `\tpub fn read_package(reader: &mut BufferReader): I${pkg.name} {`,
       `\t\tif (reader.readVarU32() !== ${pkg.index}) throw new Error("Read package type mismatch")`,
     );
     if (pkg.header === PulseHeader.Partial) {
@@ -47,7 +48,7 @@ export class GenerateTypeScriptRead {
   }
 
   private static genQuantizeFieldReader(
-    typescript: TypeScriptGenerator,
+    typescript: RustGenerator,
     field: ParserField,
     packageName: string,
   ) {
@@ -72,7 +73,7 @@ export class GenerateTypeScriptRead {
   }
 
   private static genExternalFieldReader(
-    typescript: TypeScriptGenerator,
+    typescript: RustGenerator,
     field: ParserField,
     packageName: string,
   ) {
@@ -93,7 +94,7 @@ export class GenerateTypeScriptRead {
   }
 
   private static genFieldReader(
-    typescript: TypeScriptGenerator,
+    typescript: RustGenerator,
     field: ParserField,
     packageName: string,
     isPartial?: boolean,
@@ -121,7 +122,7 @@ export class GenerateTypeScriptRead {
 
   private static genQuantizeValueReader(field: ParserField): string {
     const qunatizer =
-      TO_QUNATIZER_READ_TYPE[field.type.internalType as PulseType.F32][
+      TO_RUST_QUNATIZER_WRITE_TYPE[field.type.internalType as PulseType.F32][
         field.type.externalType! as PulseQuantizedType
       ];
 
@@ -133,10 +134,8 @@ export class GenerateTypeScriptRead {
       return `${field.type.isNestedType}.readPackage(reader)`;
     }
     if (field.type.externalType)
-      if (TO_TYPESCRIPT_TYPE[field.type.internalType] === "bigint")
-        return `BigInt(reader.${TO_READER_FUNCTION[field.type.externalType!]}())`;
-      else return `reader.${TO_READER_FUNCTION[field.type.externalType!]}()`;
-    else return `reader.${TO_READER_FUNCTION[field.type.internalType]}()`;
+      return `reader.${TO_READER_RUST_FUNCTION[field.type.externalType!]}()`;
+    else return `reader.${TO_READER_RUST_FUNCTION[field.type.internalType]}()`;
   }
 
   private static genBitmaskConditionReader(

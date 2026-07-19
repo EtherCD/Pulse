@@ -2,6 +2,7 @@ import { ParserPackage, ParserField } from "../../parser";
 import { PulseHeader, PulseQuantizedType, PulseType } from "../../types";
 import { TO_QUNATIZER_WRITE_TYPE, TO_WRITER_FUNCTION } from "../consts";
 import { TypeScriptGenerator } from "../typescript";
+import { TO_TYPESCRIPT_TYPE } from "./consts";
 
 export class GenerateTypeScriptWrite {
   public static genFunction(
@@ -26,7 +27,7 @@ export class GenerateTypeScriptWrite {
         typescript.writeLines(
           `\t\tif (value["${field.name}"] != undefined) {`,
           `\t\t\twriter.writeVarU32(value["${field.name}"].length);`,
-          `\t\t\tfor (const i in value["${field.name}"]) {`,
+          `\t\t\tfor (let i = 0;i < value["${field.name}"].length; i++) {`,
           `\t\t\t\t${this.genValue(field, "i")}`,
           `\t\t\t}`,
           `\t\t}`,
@@ -41,7 +42,7 @@ export class GenerateTypeScriptWrite {
       if (field.type.isArray) {
         typescript.writeLines(
           `\t\t\twriter.writeVarU32(value["${field.name}"].length);`,
-          `\t\t\tfor (const i in value["${field.name}"]) {`,
+          `\t\t\tfor (let i = 0;i < value["${field.name}"].length; i++) {`,
           `\t\t\t\t${this.genValue(field, "i")}`,
           `\t\t\t}`,
         );
@@ -65,7 +66,10 @@ export class GenerateTypeScriptWrite {
         return `writer.${TO_WRITER_FUNCTION[field.type.internalType]}(Quantaizer.${quantizer}(value["${field.name}"]${arrayIndex ? `[${arrayIndex}]` : ""}, ${field.type.quantizedStep}))`;
     } else {
       if (field.type.externalType)
-        return `writer.${TO_WRITER_FUNCTION[field.type.externalType]}(value["${field.name}"]${arrayIndex ? `[${arrayIndex}]` : ""})`;
+        if (TO_TYPESCRIPT_TYPE[field.type.internalType] !== "bigint")
+          return `writer.${TO_WRITER_FUNCTION[field.type.externalType]}(value["${field.name}"]${arrayIndex ? `[${arrayIndex}]` : ""})`;
+        else
+          return `writer.${TO_WRITER_FUNCTION[field.type.externalType]}(Number(value["${field.name}"]${arrayIndex ? `[${arrayIndex}]` : ""}))`;
       else
         return `writer.${TO_WRITER_FUNCTION[field.type.internalType]}(value["${field.name}"]${arrayIndex ? `[${arrayIndex}]` : ""})`;
     }

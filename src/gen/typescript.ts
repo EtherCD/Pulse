@@ -1,6 +1,6 @@
 import { ParserPackage } from "../parser";
 import { PulseHeader } from "../types";
-import { TO_TYPE } from "./consts";
+import { TO_TYPESCRIPT_TYPE } from "./typescript/consts";
 import { GenerateTypeScriptRead } from "./typescript/reader";
 import {
   staticTypeScriptBufferReader,
@@ -78,11 +78,11 @@ export class TypeScriptGenerator {
     for (const field of pkg.fields) {
       if (field.isPartial && !field.isStatic)
         this.writeLine(
-          `\t${field.name}?: ${field.type.isNestedType ? "I" + field.type.isNestedType : TO_TYPE[field.type.internalType]}${field.type.isArray ? "[]" : ""};`,
+          `\t${field.name}?: ${field.type.isNestedType ? "I" + field.type.isNestedType : TO_TYPESCRIPT_TYPE[field.type.internalType]}${field.type.isArray ? "[]" : ""};`,
         );
       else
         this.writeLine(
-          `\t${field.name}: ${field.type.isNestedType ? "I" + field.type.isNestedType : TO_TYPE[field.type.internalType]}${field.type.isArray ? "[]" : ""};`,
+          `\t${field.name}: ${field.type.isNestedType ? "I" + field.type.isNestedType : TO_TYPESCRIPT_TYPE[field.type.internalType]}${field.type.isArray ? "[]" : ""};`,
         );
     }
     this.writeLine(`}`);

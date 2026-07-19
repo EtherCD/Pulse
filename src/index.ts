@@ -5,6 +5,7 @@ import { ParserPackage, PulseParser } from "./parser";
 import { Validator } from "./validator";
 import { cli, define } from "gunshi";
 import path from "node:path";
+import { RustGenerator } from "./gen/rust";
 
 (async () => {
   const processFile = (content: string): ParserPackage[] => {
@@ -25,6 +26,10 @@ import path from "node:path";
       typescript: {
         type: "boolean",
         description: "Compile files into TypeScript",
+      },
+      rust: {
+        type: "boolean",
+        description: "Compile files into Rust",
       },
       file: {
         type: "string",
@@ -75,12 +80,24 @@ import path from "node:path";
           if (ctx.values.typescript) {
             const generator = new TypeScriptGenerator(parsedFile);
             generator.generate();
-            filePath += ".ts";
-            writeFile(filePath, generator.finish(), {}, (error) => {
+            const fileName = filePath + ".ts";
+            writeFile(fileName, generator.finish(), {}, (error) => {
               if (err) console.error("Failed to write the file");
               else
                 console.info(
-                  `File ${file} successfully compiled into file ${filePath}`,
+                  `File ${file} successfully compiled into file ${fileName}`,
+                );
+            });
+          }
+          if (ctx.values.rust) {
+            const generator = new RustGenerator(parsedFile);
+            generator.generate();
+            const fileName = filePath + ".rs";
+            writeFile(fileName, generator.finish(), {}, (error) => {
+              if (err) console.error("Failed to write the file");
+              else
+                console.info(
+                  `File ${file} successfully compiled into file ${fileName}`,
                 );
             });
           }
