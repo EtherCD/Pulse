@@ -8,8 +8,6 @@ import {
 import {
   TO_READER_RUST_FUNCTION,
   TO_RUST_QUNATIZER_WRITE_TYPE,
-  TO_RUST_TYPE,
-  TO_WRITER_RUST_FUNCTION,
 } from "./consts";
 import { RustGenerator } from "../rust";
 
@@ -52,7 +50,6 @@ export class GenerateTypeScriptRead {
     field: ParserField,
     packageName: string,
   ) {
-    console.log(field.type);
     if (field.type.isArray)
       if (field.isPartial && !field.isStatic)
         typescript.writeLine(

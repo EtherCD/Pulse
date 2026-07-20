@@ -51,3 +51,17 @@ export const PulseFieldsNeedToQuantize: Array<PulseType> = [
   PulseType.F32,
   PulseType.F64,
 ];
+
+export const PulseNumberTypes: Array<PulseType> = [
+  PulseType.F16,
+  PulseType.F32,
+  PulseType.F64,
+  PulseType.I16,
+  PulseType.I32,
+  PulseType.I64,
+  PulseType.U16,
+  PulseType.U32,
+  PulseType.U64,
+  PulseType.VU32,
+  PulseType.VI32,
+];

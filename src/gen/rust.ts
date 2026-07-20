@@ -7,7 +7,6 @@ import {
   staticRustQuantaizer,
 } from "./rust/static";
 import { GenerateRustWrite } from "./rust/writer";
-import { GenerateTypeScriptWrite } from "./typescript/writer";
 
 export class RustGenerator {
   packages: ParserPackage[];
@@ -45,11 +44,11 @@ export class RustGenerator {
       for (const field of pkg.fields) {
         if (field.isPartial && !field.isStatic)
           this.writeLine(
-            `\t${field.name}: Option<${field.type.isArray ? "Vec<" : ""}${field.type.isNestedType ? field.type.isNestedType : TO_RUST_TYPE[field.type.internalType]}>${field.type.isArray ? ">" : ""},`,
+            `\tpub ${field.name}: Option<${field.type.isArray ? "Vec<" : ""}${field.type.isNestedType ? field.type.isNestedType : TO_RUST_TYPE[field.type.internalType]}>${field.type.isArray ? ">" : ""},`,
           );
         else
           this.writeLine(
-            `\t${field.name}: ${field.type.isArray ? "Vec<" : ""}${field.type.isNestedType ? field.type.isNestedType : TO_RUST_TYPE[field.type.internalType]}${field.type.isArray ? ">" : ""},`,
+            `\tpub ${field.name}: ${field.type.isArray ? "Vec<" : ""}${field.type.isNestedType ? field.type.isNestedType : TO_RUST_TYPE[field.type.internalType]}${field.type.isArray ? ">" : ""},`,
           );
       }
       this.writeLines(`}`);

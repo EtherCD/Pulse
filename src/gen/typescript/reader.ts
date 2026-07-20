@@ -51,7 +51,6 @@ export class GenerateTypeScriptRead {
     field: ParserField,
     packageName: string,
   ) {
-    console.log(field.type);
     if (field.type.isArray)
       if (field.isPartial && !field.isStatic)
         typescript.writeLine(
